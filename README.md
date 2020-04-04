@@ -11,7 +11,7 @@
 
 ### Оценки
 
-[](classification_result.jpg)
+![](classification_result.jpg)
 
 При обучении получаем следующие метрики (accuracy, усредненный по 100 значениям):
 
