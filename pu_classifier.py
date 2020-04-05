@@ -9,6 +9,7 @@ class PU_classifier:
         self.nontraditional_clf = LogisticRegression() # Classifier label/unlabel
     
     def fit(self, labeled, unlabeled):
+        # Fit model, labeled data must be of one class
         labeled_train, labeled_test = train_test_split(labeled)
         
         X_train = np.concatenate([labeled_train, unlabeled])
@@ -23,6 +24,7 @@ class PU_classifier:
         self.c = sum(predictions)/len(predictions)
         
     def predict_proba(self, X):
+        # Predict confidence for each class for each object
         nontraditional_predict = self.nontraditional_clf.predict_proba(X)[:, 1]
         pos_predict = nontraditional_predict / self.c
         neg_predict = 1 - pos_predict
@@ -30,12 +32,14 @@ class PU_classifier:
         return np.array(list(zip(neg_predict, pos_predict)))
     
     def predict(self, X, treshold=0.5):
+        # Predict initial class of object
         proba_predict = self.predict_proba(X)
         class_predict = list(map(int, proba_predict[:, 1] > treshold))
         
         return np.array(class_predict)
     
     def get_weight(self, x):
+        # Get weight for a given example of data
         prediction = self.nontraditional_clf.predict_proba(x)[0][1]
         
         comp1 = (1 - self.c)/self.c
@@ -44,6 +48,7 @@ class PU_classifier:
         return comp1*comp2
         
     def weight_fit(self, labeled, unlabeled):
+        # Fit model with weights to each example of dataset
         self.fit(labeled, unlabeled)
         
         X_train = labeled
@@ -62,7 +67,3 @@ class PU_classifier:
 
         predictions = self.nontraditional_clf.predict_proba(labeled)[:, 1]
         self.c = sum(predictions)/len(predictions)
-
-    
-    def coefficients(self):
-        return self.clf.coef_
